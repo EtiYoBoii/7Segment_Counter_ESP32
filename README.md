@@ -6,7 +6,7 @@
 * ESP32 C3
 * CD4511 IC
 * FYS-5611AUHR-21 7-Segment Display
-* 7x1Kohm Resistors
+* 8x1Kohm Resistors
 #
 # Schematic:
 * in progress....
