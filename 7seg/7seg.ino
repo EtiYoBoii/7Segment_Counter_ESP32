@@ -13,19 +13,10 @@ volatile uint8_t counter = 0;
 WebServer server(80);
 
 // Function to set the segments based on the counter value using a switch statement
-void Segments(uint8_t digit) {
-  switch(digit) {
-    case 0: digitalWrite(segment_pins[0], LOW); digitalWrite(segment_pins[1], LOW); digitalWrite(segment_pins[2], LOW); digitalWrite(segment_pins[3], LOW); break;
-    case 1: digitalWrite(segment_pins[0], HIGH); digitalWrite(segment_pins[1], LOW); digitalWrite(segment_pins[2], LOW); digitalWrite(segment_pins[3], LOW); break;
-    case 2: digitalWrite(segment_pins[0], LOW); digitalWrite(segment_pins[1], HIGH); digitalWrite(segment_pins[2], LOW); digitalWrite(segment_pins[3], LOW); break;
-    case 3: digitalWrite(segment_pins[0], HIGH); digitalWrite(segment_pins[1], HIGH); digitalWrite(segment_pins[2], LOW); digitalWrite(segment_pins[3], LOW); break;
-    case 4: digitalWrite(segment_pins[0], LOW); digitalWrite(segment_pins[1], LOW); digitalWrite(segment_pins[2], HIGH); digitalWrite(segment_pins[3], LOW); break;
-    case 5: digitalWrite(segment_pins[0], HIGH); digitalWrite(segment_pins[1], LOW); digitalWrite(segment_pins[2], HIGH); digitalWrite(segment_pins[3], LOW); break;
-    case 6: digitalWrite(segment_pins[0], LOW); digitalWrite(segment_pins[1], HIGH); digitalWrite(segment_pins[2], HIGH); digitalWrite(segment_pins[3], LOW); break;
-    case 7: digitalWrite(segment_pins[0], HIGH); digitalWrite(segment_pins[1], HIGH); digitalWrite(segment_pins[2], HIGH); digitalWrite(segment_pins[3], LOW); break;
-    case 8: digitalWrite(segment_pins[0], LOW); digitalWrite(segment_pins[1], LOW); digitalWrite(segment_pins[2], LOW); digitalWrite(segment_pins[3], HIGH); break;
-    case 9: digitalWrite(segment_pins[0], HIGH); digitalWrite(segment_pins[1], LOW); digitalWrite(segment_pins[2], LOW); digitalWrite(segment_pins[3], HIGH); break;
-    default: digitalWrite(segment_pins[0], LOW); digitalWrite(segment_pins[1], LOW); digitalWrite(segment_pins[2], LOW); digitalWrite(segment_pins[3], LOW); break;
+void displayDigit(uint8_t digit) {
+  for (int i = 0; i < 4; i++) {
+    bool bitVal = (digit >> i) & 0x01;
+    digitalWrite(segment_pins[i], bitVal ? HIGH : LOW);
   }
 }
 
@@ -95,7 +86,7 @@ void handleRoot() {
 
 void handleIncrement() {
   counter = (counter + 1) % 10; // Increment counter and loop back to 0 after 9
-  Segments(counter);             // Update display with the current counter value
+  displayDigit(counter);             // Update display with the current counter value
   server.send(200, "application/json", "{\"success\": true}");
 }
 
@@ -105,8 +96,9 @@ void setup() {
   // Initialize the segment pins
   for (int i = 0; i < 4; i++) {
     pinMode(segment_pins[i], OUTPUT);
+    digitalWrite(segment_pins[i], LOW);
   }
-  Segments(counter); // Display initial value
+  displayDigit(counter); // Display initial value
 
   // Connect to WiFi
   WiFi.begin(ssid, password);
